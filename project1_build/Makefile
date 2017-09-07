@@ -15,7 +15,7 @@ CXX           = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefau
 DEFINES       = -DQT_QML_DEBUG
 CFLAGS        = -pipe -g $(EXPORT_ARCH_ARGS) -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -mmacosx-version-min=10.10 -Wall -W -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -stdlib=libc++ -g -std=gnu++11 $(EXPORT_ARCH_ARGS) -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -mmacosx-version-min=10.10 -Wall -W -fPIC $(DEFINES)
-INCPATH       = -I../project1 -I. -I/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/macx-clang
+INCPATH       = -I../project1 -I. -I/usr/local/include -I/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/macx-clang
 QMAKE         = /Users/mkp/QT_IDE/5.9.1/clang_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -38,7 +38,7 @@ DISTNAME      = project11.0.0
 DISTDIR = /Sangha\ Shared/MyUniversity/UIO/FYS4150/project1/project1_build/.tmp/project11.0.0
 LINK          = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
 LFLAGS        = -stdlib=libc++ -headerpad_max_install_names $(EXPORT_ARCH_ARGS) -Wl,-syslibroot,/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk -mmacosx-version-min=10.10 -Wl,-rpath,@executable_path/Frameworks
-LIBS          = $(SUBLIBS)  
+LIBS          = $(SUBLIBS) -L/usr/local/lib -larmadillo -llapack -lblas 
 AR            = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar cq
 RANLIB        = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib -s
 SED           = sed
@@ -185,6 +185,7 @@ DIST          = /Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/spec_pre.prf \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/qt_config.prf \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/macx-clang/qmake.conf \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/spec_post.prf \
+		../project1/.qmake.stash \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/exclusive_builds.prf \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/mac/sdk.prf \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/toolchain.prf \
@@ -355,6 +356,7 @@ Makefile: ../project1/project1.pro /Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/macx
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/qt_config.prf \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/macx-clang/qmake.conf \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/exclusive_builds.prf \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/mac/sdk.prf \
 		/Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/toolchain.prf \
@@ -510,6 +512,7 @@ Makefile: ../project1/project1.pro /Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/macx
 /Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/qt_config.prf:
 /Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/macx-clang/qmake.conf:
 /Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/exclusive_builds.prf:
 /Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/mac/sdk.prf:
 /Users/mkp/QT_IDE/5.9.1/clang_64/mkspecs/features/toolchain.prf:
@@ -554,6 +557,7 @@ clean: compiler_clean
 
 distclean: clean 
 	-$(DEL_FILE) $(TARGET) 
+	-$(DEL_FILE) .qmake.stash
 	-$(DEL_FILE) Makefile
 
 

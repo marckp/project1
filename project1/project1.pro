@@ -5,3 +5,8 @@ CONFIG -= qt
 
 SOURCES += \
     project1_main.cpp
+
+LIBS += -L/usr/local/lib 
+LIBS += -larmadillo -llapack -lblas
+INCLUDEPATH += /usr/local/include
+

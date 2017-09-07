@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <armadillo>
 #include <cstdlib> // for exit()
 
 int main()
