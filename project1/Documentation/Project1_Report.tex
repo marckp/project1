@@ -6,7 +6,7 @@
 \usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
 								% TeX will automatically convert eps --> pdf in pdflatex		
 \usepackage{amssymb}
-
+\usepackage{amsmath}
 %SetFonts
 
 %SetFonts
@@ -18,18 +18,121 @@
 
 \begin{document}
 \maketitle
-\section{Software Specification Document}
-This is the FYS 4150 software specification document for Project 1.
-\subsection{Software Definition}
-This is the definition of the software for Project 1.  <restatement of the given project 1 problems and their parts>
-\subsection{Software Requirements}
-This is a restatement of the software goals as provided by the project 1 assignment sheet.
+\section{Abstract}
+The aim of this project is to get familiar with various vector and matrix operations, from dynamic memory allocation to the usage of programs in the library package of the course.
+\section{Introduction}
+\section{Software Design, Theoretical Models, and Algorithms}
 \subsection{Software Design}
-All software design and production principles are imposed on the development process of project1.
-The development process for project 1 uses the following pattern
-
-\subsection{Software Code Design}
-The following requirements are imposed on the C++ code used in the coding inplementation of the software requirements.
-
+The following list contains a brief description of software design practices and guidelines for how I design, code, and test software programs. These principles were learned either from training courses I took at the Jet Propulsion Laboratory, La Canada California, or are based on personal experience obtained by building software systems for the Laboratory.
+\begin{itemize}
+\item Prototyping: begin with simple functions that simulate the software functional requirements
+\item l lay the groundwork for my software programs by writing down in my own words, what I want the program to accomplish and how the program will accomplish it. This forms the basis for what are commonly refered to as functional requirments!
+\item Up front development: do the hard part first. This can mean either getting a clear understanding of the most central and most complicated parts of the program written into the documentation, building the data source needed by the program to function,  writing test programs, or any other development that's needed before the program can function or be tested properly.
+\end{itemize}
+In the case of Project 1, navigating the class repository and class documentation to be the most challenging, followed by establishing the development platform, overcoming my resistence to using C++ in which I have no fluency, and understanding the details of the algorithm. That is the order in which I approached project 1. \newline
+With respect to the development of the C++ code for Project 1:
+\begin{itemize}
+\item Project 1 requires an input parameter determining the number of steps to be used by the algorithm in it's approximation  to the solution of the the one-dimensional Poisson equation with Dirichlet boundary conditions. I decided to have the program read the input parameter from the command line.
+\item Project 1 requires the input of a 
+\item I used this parameter to build the input matrix to the algorithm.
+\item{itemize} Implement the algorithm
+\item{itemize} establish test of the algorithm.
+\end{itemize}
+\subsection{Theoretical Models for Project 1}
+\subsubsection{Project 1a}
+In this project we will solve the one-dimensional Poisson equation with Dirichlet boundary conditions by rewriting it as a set of linear equations.
+To be more explicit we will solve the equation:\newline
+\newline
+$-u^{\prime\prime} (x)=f(x)$, $x \in (0,1), u(0) = u(1) = 1$\newline
+\newline
+and we define the discretized approximation to uu as vivi with grid points $x_i=ih$ in the interval from $x_0=0 to x_{n+1}=1$. The step length or spacing is defined as $h=\frac{1}{(n+1)}$. We have then the boundary conditions $v_0=v_{n+1}=0$. We approximate the second derivative of $u$ with\newline
+\newline
+$-(v_{i+1} + v_{i-1} - 2v_i)/{h^2} = f_i$ for $i = 1,...,n$,\newline
+\newline
+where $f_i=f(x_i)$.\newline
+These equations can be re-written as a set of n linear equations in n unknows by distributing the $-1$ and multiplying both sides by $h^2$ and rearranging the terms, which gives\newline
+\newline
+$-v_{i-1} + 2v_i  - v_{i+1}=h^2 f_i$ for $i = 1,...,n$,\newline
+\newline
+Expanding these equations and applying the boundary conditions yields\newline
+\newline
+\begin{align*}
+2v_1 - v_2 &= h^2 f_1 \\
+-v_1 + 2v_2 - v_3 &= h^2f_2\\
+-v_2 + 2v_3 - v_4 &= h^3f_2\\.\\.\\.\\
+-v_{n-1} + 2v_n &= h^3f_n
+\end{align*}\newline
+\newline
+Letting $\vec{v}$ the vector of unknowns as follows\newline
+\newline
+$\vec{v}=  \begin{bmatrix}
+v_1\\
+v_2\\
+.\\
+.\\
+v_n
+\end{bmatrix}$\newline
+\newline
+Letting $\vec{b}$ the vector of values for $h^2f(x)$ evaluated at each $x_i$ as follows\newline
+\newline
+$\vec{b}=  \begin{bmatrix}
+b_1\\
+b_2\\
+.\\
+.\\
+b_n
+\end{bmatrix}  =   \begin{bmatrix}
+h^2f(x_1)\\
+h^2f(x_2)\\
+.\\
+.\\
+h^2f(x_n)
+\end{bmatrix}$\newline
+\newline
+So the following matrix equation holds
+\newline
+\newline
+$\begin{bmatrix}
+2 & -1 & ..& ..& ..& ..& ..& ..\\
+-1 & 2 & -1 & .. & ..& ..& ..& ..\\
+.. & .. & ..& ..& ..& ..& ..& ..\\
+.. & .. & .. & .. & .. & -1 & 2 & -1\\
+.. & .. & .. & .. & .. & .. & -1 & 2
+\end{bmatrix}  \begin{bmatrix}
+v_1\\
+v_2\\
+.\\
+.\\
+v_n
+\end{bmatrix} =  \begin{bmatrix}
+h^2f(x_1)\\
+h^2f(x_2)\\
+.\\
+.\\
+h^2f(x_n)
+\end{bmatrix}$\newline
+\newline\newline
+$\quad Let \quad \hat{A} = \begin{bmatrix}
+2 & -1 & ..& ..& ..& ..& ..& ..\\
+-1 & 2 & -1 & .. & ..& ..& ..& ..\\
+.. & .. & ..& ..& ..& ..& ..& ..\\
+.. & .. & .. & .. & .. & -1 & 2 & -1\\
+.. & .. & .. & .. & .. & .. & -1 & 2
+\end{bmatrix}\quad then$,\newline
+\newline
+$ \hat{A}\vec{v} = \vec{b}$\newline
+\newline
+\subsubsection{Project 1b}
+I will now develop an algorithm to solve a generalization of the "tridiagonal" system introduced in section 1a. A tridiagonal matrix is a special form of banded matrix where all the elements are zero except for those on and immediately above and below the leading diagonal. The above tridiagonal system can be generalized into the following system:\newline
+\newline 
+$a_iu_{i-1}+b_iu_i+c_{i+1}=f_i\quad i=1,...,n$\newline
+\newline
+In order that Gaussian Elimination is guaranted to yeild a solution to the tridiagonal system if the elements of $\hat{A}$ if the upper diagonal elements $a_n$, the diagonal elements $d_n$, and the lower diagonal elements $c_{i}{j}$ statisfy the following relations\newline
+\newline
+$|b_1|>|c_1|,\quad and \quad,\quad|b_n|>|a_n|\quad and \quad|b_n| \le |a_n|+|c_n|$
+\section{Results and discussion}
+\section{Conclusions and perspectives}
+\section{Appendix with extra material}
+\section{Bibliography}
 
 \end{document}  
