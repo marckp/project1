@@ -7,6 +7,16 @@
 								% TeX will automatically convert eps --> pdf in pdflatex		
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage[colorlinks, urlcolor=blue, linkcolor=black]{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\lstset { %
+    language=C++,
+    backgroundcolor=\color{white}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+
 %SetFonts
 
 %SetFonts
@@ -21,6 +31,10 @@
 \section{Abstract}
 The aim of this project is to get familiar with various vector and matrix operations, from dynamic memory allocation to the usage of programs in the library package of the course.
 \section{Introduction}
+This is a report written by myself for Project1, Computation Physics 2017. A copy of this report as well as C++ programming code, and other related files can be found at:\newline\newline
+\href{https://github.com/marckp/project1}{project1 master branch}\newline
+\href{https://github.com/marckp/project1/tree/master/project1}{C++ code}\newline
+\href{https://github.com/marckp/project1/tree/master/project1/Documentation}{Project 1 report and results}
 \section{Software Design, Theoretical Models, and Algorithms}
 \subsection{Software Design}
 The following list contains a brief description of software implementation practices and guidelines for how I design, code, and test software programs.
@@ -33,6 +47,7 @@ The following list contains a brief description of software implementation pract
 In the case of Project 1, navigating the class repository and class documentation to be the most challenging, followed by establishing the development platform, overcoming my resistence to using C++ in which I have no fluency, and understanding the details of the algorithm. That is the order in which I approached project 1. \newline
 With respect to the development of the C++ code for Project 1:
 \begin{itemize}
+\item Project 1 code base was started from a listing I found in the lecture material under the heading "Project 1 hints". 
 \item Project 1 requires two input parameters determining the number of steps to be used by the algorithm in it's approximation  to the solution of the the one-dimensional Poisson equation with Dirichlet boundary conditions. I decided to have the program read the input parameters from the command line. Also, I used this parameter to build the input matrix to the algorithm.
 \item Project 1 requires the input of tri-diagonal vectors elements. In all cases I have hardcoded the inputs so that they meet the requirements of the algorithms.
 \end{itemize} Two functions were developed in which  one was a generalization of the others. Tests were performed to verify the each function gave identical results when setup with identical inputs.
@@ -184,7 +199,7 @@ $u_{i-1}=(\tilde{f}_i -c_{i-1}u_i)/\tilde{d}_{i-1}$\newline
 The program I created takes two command line inputs: root name of the file into which a table of results were stored, and the second is the highest exponent of 10 used to determine the step size increment. So executing the following command would perform the tri-diagonal elimination method using step sizes of 10, 100, 1000, 10000, 100000, and 1000000. This command also created 6 files with the stem 'test' appending  the step size exponent to the stem resulting in the creation of test1, test2, test3, test4, test5, and test6. 
 prompt>./project1 test 6<return>
 
-Two functions were defined using C++ forward declaration techniques:/newline
+Two functions were defined using C++ forward declaration techniques:\newline
 // C++ code\newline
 void simpleTridiagonalAlg(int n,double *sol,double *x);\newline
 void generalTridiagonalAlg(int n,double *u,double *x,double *d,double *c,double *a);\newline
@@ -192,10 +207,228 @@ void generalTridiagonalAlg(int n,double *u,double *x,double *d,double *c,double 
 
 As shown, the arrays used for the 3 diagonals of the system were created using dynamic memory allocation. Regression testing was performed to verify that the two functions agreed when the function for the general case was supplied  with the values for the a[i]'s, d[i]'s, and c[i]'s corresponding to the system described in part 1 a), i.e. a[i] = -1, d[i] =2, and c[i] = -1. Testing was perform by running the program twice using first the simple form of the algorithm and then with the generalized form. The files from the first run were compared with the output files of the second run using the LINUX diff command that reports any ascii differences between two files on a line by line basis. Both functions produced identical results.
 
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{test_1.png}
+  \caption{Step size of $10^{-1}$}
+  \label{fig:Relative Error}
+\end{figure}
 
-  
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{test_2.png}
+  \caption{Step size of $10^{-2}$}
+  \label{fig:boat1}
+\end{figure}
+
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{test_3.png}
+  \caption{Step size of $10^{-3}$}
+  \label{fig:Relative Error}
+\end{figure}
+
+ \begin{figure}[H]
+  \includegraphics[width=\linewidth]{test_4.png}
+  \caption{Step size of $10^{-4}$}
+  \label{fig:Relative Error}
+\end{figure}
+
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{test_5.png}
+  \caption{Step size of $10^{-5}$}
+  \label{fig:Relative Error}
+\end{figure}
+
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{test_6.png}
+  \caption{Step size of $10^{-6}$}
+  \label{fig:Relative Error}
+\end{figure}
+
 \section{Conclusions and perspectives}
-\section{Appendix with extra material}
-\section{Bibliography}
+\section{C++ Code}
+\begin{lstlisting}
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <cmath>
+#include <vector>
+#include <string>
+#include <armadillo>
+
+
+// use namespace for output and input
+using namespace arma;
+using namespace std;
+
+// object for output files
+ofstream ofile;
+
+// Functions used
+inline double f_actualInputSolution(double x){return 100.0*exp(-10.0*x);}
+inline double exact(double x) {return 1.0-(1-exp(-10))*x-exp(-10*x);}
+
+// Test function interface forward function declaration
+void simpleTridiagonalAlg(int n,double *sol,double *x);
+void generalTridiagonalAlg(int n,double *u,double *x,double *d,double *c,double *a);
+\begin{listings}
+// Begin main program
+int main(int argc, char **argv)
+{
+    // The range of input exponent values and the current output filename variables
+    int exponent    = 0;
+    string filename;
+
+    // We read also the basic name for the output file and the highest power of 10^n we want
+    cout << "number of args: " << argc << endl;
+    if( argc <= 1 )
+    {
+          cout << "Bad Usage: " << argv[0] <<
+              " read also file name on same line and max power 10^n" << endl;
+          exit(1);
+    }
+    else
+    {
+        // first command line argument after name of program
+        filename    = argv[1];
+        exponent    = atoi(argv[2]);
+        cout << "Highest value of the exponent: " << exponent << endl;
+    }
+
+    double test = exact(1.0);
+    cout << "test result: " << test << endl;
+
+    // Loop over powers of 10
+    for (int i = 1; i <= exponent; i++)
+    {
+      int n = (int) pow(10.0,i);
+
+      // Declare new file name
+      string fileout = filename;
+
+      // Convert the power 10^i to a string
+      string argument = to_string(i);
+
+      // Final filename as filename-i-
+      fileout.append(argument);
+
+      // Dynamic array created for the diagonal, upper diagonal, and lower diagonal elemements
+      double *d   = new double [n+1];
+      double *c   = new double [n+1];
+      double *a   = new double [n+1];
+
+      //initialize with simple case of D problem
+      for (int i=0; i < n+1; i++)
+      {
+          d[i]    = +2;
+          a[i]    = -1;
+          c[i]    = -1;
+      }
+      d[n]    = +2;
+
+      // Set up the input grid, and solution array
+      double *solution  = new double [n+1];
+      double *x         = new double [n+1];
+
+      // Test function interface
+      // simpleTridiagonalAlg(n,solution,x);
+      generalTridiagonalAlg(n,solution,x,d,a,c);
+
+      // Make the current file
+      ofile.open(fileout);
+      ofile << setiosflags(ios::showpoint | ios::uppercase);
+
+      //      ofile << "       x:             approx:          exact:       relative error" << endl;
+      for (int i = 1; i < n + 1;i++)
+      {
+        double xval = x[i];
+        double RelativeError = fabs((exact(xval)-solution[i])/exact(xval));
+        ofile << setw(15) << setprecision(8) << xval;
+        ofile << setw(15) << setprecision(8) << solution[i];
+        ofile << setw(15) << setprecision(8) << exact(xval);
+        ofile << setw(15) << setprecision(8) << log10(RelativeError) << endl;
+      }
+      ofile.close();
+
+      // clean up for next interation
+      delete [] x; delete [] solution; delete [] d;  delete [] a; delete [] c;
+    }
+
+    return 0;
+}
+
+// Program function definitions
+
+// Simple case of the tri-diagonal algorithm
+void simpleTridiagonalAlg(int n,double *sol,double *x)
+{
+    // Set up arrays for the simple case
+    double *d = new double [n+1];
+    double *b = new double [n+1];
+
+    // Quick setup of updated diagonal elements and value of the simple verion of the tri-diagonal matrix
+    double h    = 1.0/(n+1);
+    double hh   = h*h;
+    d[0]        = d[n]      = 2;
+    sol[n]      = 0.0;
+    for (int i = 0; i <= n; i++)
+    {
+      x[i]= i*h;
+      b[i] = hh*f_actualInputSolution(i*h);
+    }
+
+    // Forward substitution
+    for (int i = 1; i < n; i++)
+    {
+        d[i] = (i+1.0)/( (double) i);
+    }
+
+    for (int i = 1; i < n+1; i++)
+    {
+        b[i] = b[i] + b[i-1]/d[i-1];
+    }
+
+    // Backward substitution
+    for (int i = n-1; i > 0; i--)
+    {
+        sol[i] = (b[i]+sol[i+1])/d[i];
+    }
+}
+
+// General case if the tri-diagonal algoritm
+void generalTridiagonalAlg(int n,double *u,double *x,double *d,double *c,double *a)
+{
+    // array of values of f in the nxn system
+    double *v = new double [n+1];
+
+    // Quick setup of updated diagonal elements and value of the general verion of the tri-diagonal matrix
+    double h    = 1.0/(n+1);
+    double hh   = h*h;
+    for (int i = 0; i < n+1; i++)
+    {
+      x[i]= i*h;
+      v[i] = hh*f_actualInputSolution(i*h);
+    }
+
+    // Forward substitution
+    //modify the diagonal elements
+    for (int i = 1; i < n+1; i++)
+    {
+        d[i] = d[i] - c[i-1]*a[i]/d[i-1];
+    }
+
+    //modify the desired output values for the system to correspond with the changes made by the Forward Substitution above
+    for (int i = 1; i < n + 1; i++)
+    {
+        v[i] = v[i] - v[i-1]*a[i]/d[i-1];
+    }
+
+    // Backward substitution gives the final solution
+    u[n] = v[n]/d[n];
+    for (int i = n; i > 0; i--)
+    {
+        u[i-1] = (v[i] - c[i]*u[i])/d[i-1];
+    }
+}
+
+\end{lstlisting}
 
 \end{document}  
