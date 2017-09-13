@@ -23,21 +23,19 @@ The aim of this project is to get familiar with various vector and matrix operat
 \section{Introduction}
 \section{Software Design, Theoretical Models, and Algorithms}
 \subsection{Software Design}
-The following list contains a brief description of software design practices and guidelines for how I design, code, and test software programs. These principles were learned either from training courses I took at the Jet Propulsion Laboratory, La Canada California, or are based on personal experience obtained by building software systems for the Laboratory.
+The following list contains a brief description of software implementation practices and guidelines for how I design, code, and test software programs.
 \begin{itemize}
-\item Prototyping: begin with simple functions that simulate the software functional requirements
-\item l lay the groundwork for my software programs by writing down in my own words, what I want the program to accomplish and how the program will accomplish it. This forms the basis for what are commonly refered to as functional requirments!
+\item I use a simple software development cycle: documentation $\leftrightarrow$ coding. I general begin, as I describe next, with documentation. However, there is no requirement here. The process is simple, I alternate between documenting my code and writing my code. I find that process improves both the quality of the programs and their documents.
+\item How I start: l lay the groundwork for my software programs by writing down in my own words, what I want the program to accomplish and how the program will accomplish it. This forms the basis for what are commonly referred to as functional requirements. In the case of Project 1, I focused mainly on understanding the mathematical development of the algorithm. In the case of Project 1,  I started by getting a clear understanding the functional requirements by understanding the recursion equations involved with Gaussian Elimination using forward and backward substitutions. I was unable to complete the LU decomposition part of the project.
 \item Up front development: do the hard part first. This can mean either getting a clear understanding of the most central and most complicated parts of the program written into the documentation, building the data source needed by the program to function,  writing test programs, or any other development that's needed before the program can function or be tested properly.
+\item Regression testing: after each program upgrade, verify that the new program reproduces the same results when appropriate. As described below, two algorithms were tested, the first dealing with the estimation of the second derivative and the associated tri-diagonal matrix, and the second dealing with a generalization of this system to one that is still tri-diagonal, but doesn't restrict the values of the diagonal elements to -1, 2, and 1.
 \end{itemize}
 In the case of Project 1, navigating the class repository and class documentation to be the most challenging, followed by establishing the development platform, overcoming my resistence to using C++ in which I have no fluency, and understanding the details of the algorithm. That is the order in which I approached project 1. \newline
 With respect to the development of the C++ code for Project 1:
 \begin{itemize}
-\item Project 1 requires an input parameter determining the number of steps to be used by the algorithm in it's approximation  to the solution of the the one-dimensional Poisson equation with Dirichlet boundary conditions. I decided to have the program read the input parameter from the command line.
-\item Project 1 requires the input of a 
-\item I used this parameter to build the input matrix to the algorithm.
-\item{itemize} Implement the algorithm
-\item{itemize} establish test of the algorithm.
-\end{itemize}
+\item Project 1 requires two input parameters determining the number of steps to be used by the algorithm in it's approximation  to the solution of the the one-dimensional Poisson equation with Dirichlet boundary conditions. I decided to have the program read the input parameters from the command line. Also, I used this parameter to build the input matrix to the algorithm.
+\item Project 1 requires the input of tri-diagonal vectors elements. In all cases I have hardcoded the inputs so that they meet the requirements of the algorithms.
+\end{itemize} Two functions were developed in which  one was a generalization of the others. Tests were performed to verify the each function gave identical results when setup with identical inputs.
 \subsection{Theoretical Models for Project 1}
 \subsubsection{Project 1a}
 In this project we will solve the one-dimensional Poisson equation with Dirichlet boundary conditions by rewriting it as a set of linear equations.
@@ -45,7 +43,7 @@ To be more explicit we will solve the equation:\newline
 \newline
 $-u^{\prime\prime} (x)=f(x)$, $x \in (0,1), u(0) = u(1) = 1$\newline
 \newline
-and we define the discretized approximation to uu as vivi with grid points $x_i=ih$ in the interval from $x_0=0 to x_{n+1}=1$. The step length or spacing is defined as $h=\frac{1}{(n+1)}$. We have then the boundary conditions $v_0=v_{n+1}=0$. We approximate the second derivative of $u$ with\newline
+and we define the discretized approximation to $u$ as $v_i$ with grid points $x_i=ih$ in the interval from $x_0=0$ to $x_{n+1}=1$. The step length or spacing is defined as $h=\frac{1}{(n+1)}$. We have then the boundary conditions $v_0=v_{n+1}=0$. We approximate the second derivative of $u$ with\newline
 \newline
 $-(v_{i+1} + v_{i-1} - 2v_i)/{h^2} = f_i$ for $i = 1,...,n$,\newline
 \newline
@@ -125,12 +123,77 @@ $ \hat{A}\vec{v} = \vec{b}$\newline
 \subsubsection{Project 1b}
 I will now develop an algorithm to solve a generalization of the "tridiagonal" system introduced in section 1a. A tridiagonal matrix is a special form of banded matrix where all the elements are zero except for those on and immediately above and below the leading diagonal. The above tridiagonal system can be generalized into the following system:\newline
 \newline 
-$a_iu_{i-1}+b_iu_i+c_{i+1}=f_i\quad i=1,...,n$\newline
+$a_iu_{i-1}+d_iu_i+c_iu_{i+1}=f_i\quad i=1,...,n$\newline
 \newline
-In order that Gaussian Elimination is guaranted to yeild a solution to the tridiagonal system if the elements of $\hat{A}$ if the upper diagonal elements $a_n$, the diagonal elements $d_n$, and the lower diagonal elements $c_{i}{j}$ statisfy the following relations\newline
+for $i=1,2,...,n$. We see that $u_0$ and $u_{n+1}$ are 0 (boundary conditions) and not required and we can set $a_1=c_n=0$. So  the lower diagonal elements $a_i$, the diagonal elements $d_i$, and the upper diagonal elements $c_i$ give $\hat{A}$ the general form:\newline
 \newline
-$|b_1|>|c_1|,\quad and \quad,\quad|b_n|>|a_n|\quad and \quad|b_n| \le |a_n|+|c_n|$
+$\quad Let \quad \hat{A} = \begin{bmatrix}
+d_1 & c_1 & ..& ..& ..& ..& ..& ..\\
+a_2 & d_2 & c_2 & .. & ..& ..& ..& ..\\
+.. & a_3 & d_3 & c_3 & .. & .. & .. & ..\\
+.. & .. & .. & .. & .. & .. & .. & ..\\
+.. & .. & .. & .. & .. & a_{n-1} & d_{n-1} & c_{n-1}\\
+.. & .. & .. & .. & .. & .. & a_n & d_n
+\end{bmatrix}\quad then$,\newline
+\newline
+In order that Gaussian Elimination is guaranteed to yield a solution to the tridiagonal system the elements of $\hat{A}$ must satisfy two conditions: 1) elements of $\hat{A}$ statisfy the following relations:
+\newline
+$|b_1|>|c_1|$, and, $|b_n|>|a_n|$, and, $|b_n| \le |a_n|+|c_n|$\newline
+This is called the dominance condition. 2) If the off diagonal elements are non-zero, that is the $a_i$ and $c_i$ are non-zero so that $\hat{A}$ is irreducible. If these two conditions are present, the $\hat{A}$ is nonsingular and has a unique LU decomposition, and so the linear system that $\hat{A}$ represents has a unique solution.\newline
+\newline
+I began the Gaussian Elimination with putting $\hat{A}$ into the proper form for backward substitution (starting with the last row), by performing a forward substitution (elimination starting with the first row). The desired form is to have only non-zero upper diagonal and diagonal elements. Since the first row of $\hat{A}$ is already in the proper form, the first step in the algorithm begins with a modification to the second row using the first row. The $i^{th}$ step modifies the ${i+1}^{th}$ row using the $i^{th}$ row for a total of $n-1$ modifications. So the general algorithm is defined inductively as follows:\newline
+\newline
+$i^{th}$ step: subtract $a_{i+1}a_i/\tilde{d_i}$ times the updated $i^{th}$ row from the ${i+1}^{th}$ row as illustrated\newline
+\newline
+Before:\newline
+\newline
+$\begin{bmatrix}
+0 & \tilde{d_i} & c_i & ..& ..& ..& ..& ..& ..\\
+0 & a_{i+1} & d_{i+1} & c_{i+1} & .. & ..& ..& ..& ..
+\end{bmatrix}$\newline
+\newline
+After:\newline
+\newline
+$\begin{bmatrix}
+0 & \tilde{d_i} & c_i & 0 & 0 & ..& ..& ..& ..\\
+0 & 0 & d_{i+1} - a_{i+1}c_i/\tilde{d_i} & c_{i+1} & 0 & ..& ..& ..& ..
+\end{bmatrix}$\newline
+\newline
+So that the ${i+1}^{th}$ row becomes:\newline
+\newline
+$\begin{bmatrix}
+0 & \tilde{d_i} & c_i & 0 & 0 & ..& ..& ..& ..\\
+0 & 0 & \tilde{d}_{i+1} & c_{i+1} & 0 & ..& ..& ..& ..
+\end{bmatrix}$\newline
+\newline
+where $\tilde{d}_{i+1} = d_{i+1} - a_{i+1}c_i/\tilde{d_i}$ \newline
+\newline
+Since we are solving the general linear system above, the same steps are applied to both sides of $\hat{A}\vec{u} = \vec{f}$, so that\newline
+\newline
+$\tilde{f}_{i+1} = f_{i+1} - a_{i+1}\tilde{f}_i/\tilde{d_i}$\newline
+\newline
+Now I can employ backward substitution to find the solution $\vec{u}$. Starting with the last row, solve for $u_n$ which gives:\newline
+\newline
+$u_n = \tilde{f}_n/\tilde{d}_n$\newline
+\newline
+starting from the solution from the $i^{th}$  row to  ${i-1}^{th}$ row, solve for $u_{i-1}$ as follows:\newline
+\newline
+$u_{i-1}=(\tilde{f}_i -c_{i-1}u_i)/\tilde{d}_{i-1}$\newline
+\newline
 \section{Results and discussion}
+The program I created takes two command line inputs: root name of the file into which a table of results were stored, and the second is the highest exponent of 10 used to determine the step size increment. So executing the following command would perform the tri-diagonal elimination method using step sizes of 10, 100, 1000, 10000, 100000, and 1000000. This command also created 6 files with the stem 'test' appending  the step size exponent to the stem resulting in the creation of test1, test2, test3, test4, test5, and test6. 
+prompt>./project1 test 6<return>
+
+Two functions were defined using C++ forward declaration techniques:/newline
+// C++ code\newline
+void simpleTridiagonalAlg(int n,double *sol,double *x);\newline
+void generalTridiagonalAlg(int n,double *u,double *x,double *d,double *c,double *a);\newline
+// end C++ code\newline
+
+As shown, the arrays used for the 3 diagonals of the system were created using dynamic memory allocation. Regression testing was performed to verify that the two functions agreed when the function for the general case was supplied  with the values for the a[i]'s, d[i]'s, and c[i]'s corresponding to the system described in part 1 a), i.e. a[i] = -1, d[i] =2, and c[i] = -1. Testing was perform by running the program twice using first the simple form of the algorithm and then with the generalized form. The files from the first run were compared with the output files of the second run using the LINUX diff command that reports any ascii differences between two files on a line by line basis. Both functions produced identical results.
+
+
+  
 \section{Conclusions and perspectives}
 \section{Appendix with extra material}
 \section{Bibliography}
